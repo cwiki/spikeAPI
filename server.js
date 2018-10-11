@@ -7,8 +7,6 @@ const { rateLimit, hosts, environment } = require('./config')
 const cors = require('cors')
 const hostValidation = require('host-validation')
 const { authentication, logger } = require('./app/src')
-// app inclusions
-const main = require('./app')
 
 // setting up express and auth
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -37,6 +35,8 @@ app.use((req, res, next) => {
   }
 })
 
-main.bootstrap(app)
+// add api
+app.use('/', require('./app/routes/toast'))
+
 // api hook
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
