@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const { response } = require('../src')
-const spike = require('../src/spike')
+const { response } = require('../../src')
+const spike = require('../../src/spike')
 // test database
-const { testDB } = require('../src/connections')
+const { testDB } = require('../models/connections')
 // toast db definition
-const toast = require('../definitions/toast')
+const toast = require('../models/toast').definition
 
 // IMPLIMENTS SPIKE.FIND
-router.get('/toast', function (req, res) {
+router.get('/', function (req, res) {
   testDB.then(conn => {
     spike.find(conn, toast, req.query)
       .then(data => res.sendJSON(0, data[0]))
@@ -16,7 +16,7 @@ router.get('/toast', function (req, res) {
   })
 })
 // IMPLIMENTS SPIKE.FINDONE
-router.post('/toast', function (req, res) {
+router.post('/', function (req, res) {
   testDB.then(conn => {
     spike.insert(conn, toast, req.body).then(data => {
       spike.findOne(conn, toast, data[0].insertId).then(data => {
@@ -26,7 +26,7 @@ router.post('/toast', function (req, res) {
   })
 })
 // IMPLIMENTS SPIKE.FINDONE
-router.get('/toast/:id', function (req, res) {
+router.get('/:id', function (req, res) {
   testDB.then(conn => {
     spike.findOne(conn, toast, req.params.id)
       .then(data => { res.sendJSON(0, data[0]) })
@@ -34,7 +34,7 @@ router.get('/toast/:id', function (req, res) {
   })
 })
 // IMPLIMENTS SPIKE.UPDATE
-router.patch('/toast/:id', function (req, res) {
+router.patch('/:id', function (req, res) {
   testDB.then(conn => {
     spike.update(conn, toast, req.body, req.params.id).then(data => {
       spike.findOne(conn, toast, req.params.id).then(data => {
@@ -43,9 +43,8 @@ router.patch('/toast/:id', function (req, res) {
     }).catch(err => { res.sendJSON(err.message) })
   })
 })
-
 // IMPLIMENTS SPIKE.DESTORY
-router.delete('/toast/:id', function (req, res) {
+router.delete('/:id', function (req, res) {
   connection.then(conn => {
     spike.destroy(conn, toast, req.params.id).then(data => {
       if (data[0].affectedRows) {

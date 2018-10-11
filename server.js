@@ -6,7 +6,7 @@ const RateLimit = require('express-rate-limit')
 const { rateLimit, hosts, environment } = require('./config')
 const cors = require('cors')
 const hostValidation = require('host-validation')
-const { authentication, logger } = require('./app/src')
+const { authentication, logger } = require('./src')
 
 // setting up express and auth
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 })
 
 // add api
-app.use('/', require('./app/routes/toast'))
+app.use(require('./app'))
 
 // api hook
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
