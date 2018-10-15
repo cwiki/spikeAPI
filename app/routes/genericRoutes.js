@@ -50,7 +50,7 @@ function addGenerics(router, database, definition, action) {
     }))
     // IMPLIMENTS SPIKE.DESTROY
     router.delete('/:id', asky.decorator('delete', action, function (req, res) {
-        connection.then(conn => {
+        database.then(conn => {
             spike.destroy(conn, definition, req.params.id).then(data => {
                 if (data[0].affectedRows) {
                     res.sendJSON(null, 'success')
