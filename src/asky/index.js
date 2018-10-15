@@ -120,10 +120,9 @@ function can(storage, groups) {
  * @param {Object} user.groups target element for can evaluation
  */
 function canUser(storage, user) {
+    if (!user.groups) user.groups = {}
     if (user.hasOwnProperty('groups')) {
         return can(storage, user.groups)
-    } else {
-        return false
     }
 }
 
@@ -137,7 +136,7 @@ module.exports = storage => {
         allow: group => {
             return allow(storage, group)
         },
-        can: groups => {
+        can: group => {
             return can(storage, group)
         },
         canUser: user => {

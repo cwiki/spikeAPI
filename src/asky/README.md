@@ -1,11 +1,11 @@
-# Askilisk
+# Asky
 
 Group based permission system build around easy to use sentance sytle syntax
 
 
 ```js
-const askilisk = require(...)
-const ask =  askilisk()
+const asky = require(...)
+const ask =  asky()
 // Setup ASK
 ask.allow('user').to('fight')
 // example user/context
@@ -18,9 +18,9 @@ ask.canUser(Milo).read('flight') // false
 # API
 
 
-## askilisk
+## Asky
 ```js
-askilisk([storage<object>]): ask<object>
+asky([storage<object>]): ask<object>
 ```
 Creates a new instance of __ask__.
 
@@ -32,31 +32,31 @@ ask.allow(group<String>).to(action<String>)
 
 Allows for respective action to bperformed <br>
 ```js
-__ask.allow(group<String>).toCreate(action<String>)__<br>
-__ask.allow(group<String>).toRead(action<String>)__<br>
-__ask.allow(group<String>).toUpdate(action<String>)__<br>
-__ask.allow(group<String>).toDelete(action<String>)__<br>
+ask.allow(group<String>).toCreate(action<String>)
+ask.allow(group<String>).toRead(action<String>)
+ask.allow(group<String>).toUpdate(action<String>)
+ask.allow(group<String>).toDelete(action<String>)
 ```
 
-Disallows for respective action to bperformed <br>
+Disallows for respective action to bperformed 
 ```js
-__ask.allow(group<String>).notToCreate(action<String>)__<br>
-__ask.allow(group<String>).notToRead(action<String>)__<br>
-__ask.allow(group<String>).notToUpdate(action<String>)__<br>
-__ask.allow(group<String>).notToDelete(action<String>)__<br>
+ask.allow(group<String>).notToCreate(action<String>)
+ask.allow(group<String>).notToRead(action<String>)
+ask.allow(group<String>).notToUpdate(action<String>)
+ask.allow(group<String>).notToDelete(action<String>)
 ```
 
 
 ## ask.canUser() && ask.can()
-Checks to see if a set of groups allows for actions <br>
+Checks to see if a set of groups allows for actions 
 ```js
-__ask.can(groups<Object>).create(action<String>)__<br>
-__ask.can(groups<Object>).read(action<String>)__<br>
-__ask.can(groups<Object>).update(action<String>)__<br>
-__ask.can(groups<Object>).delete(action<String>)__<br>
+ask.can(groups<Object>).create(action<String>)
+ask.can(groups<Object>).read(action<String>)
+ask.can(groups<Object>).update(action<String>)
+ask.can(groups<Object>).delete(action<String>)
 ```
 
-Checks to see if a user (with groups) is allowed for actions <br>
+Checks to see if a user (with groups) is allowed for actions 
 ```js
 ask.canUser(Object.groups<Object>).create(action<String>)
 ask.canUser(Object.groups<Object>).read(action<String>)
@@ -78,9 +78,14 @@ japanUser = {
     journalist: ['japan'],
     dancer: ''
 }
+
+// PAPER
+ask.canUser(japanUser).read('paper') // true
 ask.canUser(japanUser).when('japan').read('paper') // true
 ask.canUser(japanUser).when('china').read('paper') // false
 
+// DANCE
+ask.canUser(japanUser).read('dance') // true
 ask.canUser(japanUser).when('japan').read('dance') // true
 ask.canUser(japanUser).when('china').read('dance') // true
 
@@ -93,12 +98,28 @@ This may be on a user object. The groups<object> should contain group names as k
 
 ```js
 groups = {
-    group: ['context', 'modifier'],
+    group: ['context', 'modifier'], // group member, but can be scoped
     group2: 1, // group memeber
     group3: '', // also a group member
     group4: false, // still a group member
 }
+// if there is no scope then all scopes are accepted
 
 groups // use with can(groups)
 User.groups = groups // use with canUser(User)
+```
+
+## Duplicate Permissions
+**_We recommend avoiding duplicate permissions_**  
+If you decide to duplicate permissions they are optimistically scoped.
+```js
+ask.allow('user').to('jump').notTo('read')
+ask.allow('admin').to('jump')
+user1 = {
+    groups: {
+        user: ['southern'],
+        admin: true
+    }
+}
+ask.canUser(user1).read('jump') // true
 ```

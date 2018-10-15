@@ -1,6 +1,7 @@
 const { response } = require('../../src')
 const spike = require('../../src/spike')
 const cp = require('../context')
+const asky = require('../asky')
 
 /**
  * Attachces generic endpoints to a specified route
@@ -9,19 +10,19 @@ const cp = require('../context')
  * @param {!Object} database Database used for endpoint
  * @param {!Object} definition model definition
  * @param {!Object} definition access requirements
+ * @param {string} action access permission
  */
-function addGenerics(router, database, definition, requires) {
+function addGenerics(router, database, definition, action) {
     // IMPLIMENTS SPIKE.FIND
-    router.get('/', function (req, res) {
-        // cp.requires(requires, req.locals.cprm)
+    router.get('/', asky.decorator('read', action, function (req, res) {
         database.then(conn => {
             spike.find(conn, definition, req.query)
                 .then(data => res.sendJSON(0, data[0]))
                 .catch(err => res.sendJSON(err.message))
         })
-    })
+    }))
     // IMPLIMENTS SPIKE.INSERT
-    router.post('/', function (req, res) {
+    router.post('/', asky.decorator('create', action, function (req, res) {
         database.then(conn => {
             spike.insert(conn, definition, req.body).then(data => {
                 spike.findOne(conn, definition, data[0].insertId).then(data => {
@@ -29,17 +30,17 @@ function addGenerics(router, database, definition, requires) {
                 }).catch(err => { res.sendJSON(err.message) })
             }).catch(err => { res.sendJSON(err.message) })
         })
-    })
+    }))
     // IMPLIMENTS SPIKE.FINDONE
-    router.get('/:id', function (req, res) {
+    router.get('/:id', asky.decorator('read', action, function (req, res) {
         database.then(conn => {
             spike.findOne(conn, definition, req.params.id)
                 .then(data => { res.sendJSON(0, data[0]) })
                 .catch(err => { res.sendJSON(err.message) })
         })
-    })
+    }))
     // IMPLIMENTS SPIKE.UPDATE
-    router.patch('/:id', function (req, res) {
+    router.patch('/:id', asky.decorator('update', action, function (req, res) {
         database.then(conn => {
             spike.update(conn, definition, req.body, req.params.id).then(data => {
                 spike.findOne(conn, definition, req.params.id).then(data => {
@@ -47,9 +48,9 @@ function addGenerics(router, database, definition, requires) {
                 }).catch(err => { res.sendJSON(err.message) })
             }).catch(err => { res.sendJSON(err.message) })
         })
-    })
+    }))
     // IMPLIMENTS SPIKE.DESTROY
-    router.delete('/:id', function (req, res) {
+    router.delete('/:id', asky.decorator('delete', action, function (req, res) {
         connection.then(conn => {
             spike.destroy(conn, definition, req.params.id).then(data => {
                 if (data[0].affectedRows) {
@@ -59,7 +60,7 @@ function addGenerics(router, database, definition, requires) {
                 }
             }).catch(err => { res.sendJSON(err.message) })
         })
-    })
+    }))
 }
 
 module.exports = {

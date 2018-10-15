@@ -1,4 +1,4 @@
-const askPermissions = require('./index')
+const asky = require('.')
 
 const user = {
     groups: {
@@ -9,7 +9,7 @@ const user = {
     }
 }
 
-let ask = askPermissions()
+let ask = asky()
 beforeAll(() => {
     ask.allow('user').to('fight')
     ask.allow('hamster').toRead('visa')
@@ -27,6 +27,10 @@ beforeAll(() => {
         .notToCreate('swim')
         .notToUpdate('swim')
         .notToDelete('swim')
+})
+
+test('returns false if no groups specified', () => {
+    expect(ask.canUser({}).read('fight')).toEqual(false)
 })
 
 test('user can read fight', () => {
@@ -74,4 +78,39 @@ test('when context in permission context true', () => {
 
 test('when context not in permission context false', () => {
     expect(ask.canUser(user).when('beijing').read('fight')).toEqual(false)
+})
+
+describe('dealing with duplicate permission names', () => {
+    beforeAll(() => {
+        this.askk = asky()
+        this.askk.allow('user').to('jump')
+        this.askk.allow('admin').to('jump')
+        this.askk.allow('user').to('swim').notToRead('swim')
+        this.askk.allow('admin').to('swim')
+    }),
+    test('still pass' ,  () => {
+        expect(this.askk.can({'user': 1}).read('jump')).toEqual(true)
+        expect(this.askk.can({'admin': 1}).read('jump')).toEqual(true)
+        expect(this.askk.can({'admin': 1, 'user': 1}).read('jump')).toEqual(true)
+    }),
+    test('scopings passes' ,  () => {
+        expect(this.askk.can({'user': ['jumanji']}).when('jumanji').read('jump')).toEqual(true)
+        expect(this.askk.can({'admin': ['jumanji']}).when('jumanji').read('jump')).toEqual(true)
+    }),
+    test('scopings passes mixed' ,  () => {
+        expect(this.askk.can({'admin': 1, 'user': ['jumanji']}).when('jumanji').read('jump')).toEqual(true)
+        expect(this.askk.can({'admin': ['jumanji'], 'user': 1}).when('jumanji').read('jump')).toEqual(true)
+    }),
+    test('failed with no correct scope' ,  () => {
+        expect(this.askk.can({'admin': ['timber'], 'user': ['jumanji']}).when('tiger').read('jump')).toEqual(false)
+        expect(this.askk.can({'admin': ['jumanji'], 'user': ['timber']}).when('tiger').read('jump')).toEqual(false)
+    }),
+    test('scopes are additive, redactions are ignored' ,  () => {
+        expect(this.askk.can({'admin': 1, 'user': 1}).read('swim')).toEqual(true)
+        expect(this.askk.can({'user': 1}).read('swim')).toEqual(false)
+    }),
+    test('still obeys scoping' ,  () => {
+        expect(this.askk.can({'user': ['sans'], 'admin': ['jerico']}).when('jerico').read('swim')).toEqual(true)
+        expect(this.askk.can({'user': ['jerico'], 'admin': ['sans']}).when('jerico').read('swim')).toEqual(false)
+    })
 })

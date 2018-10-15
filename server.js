@@ -8,11 +8,11 @@ const cors = require('cors')
 const hostValidation = require('host-validation')
 const { authentication, logger } = require('./src')
 
-// CPRM are context permissions for this user
-function getCPRM(oid) {
+// GROUPS are context permissions for this user
+function getGroups(oid) {
   return new Promise((resolve, reject) => {
-    console.log(oid + ' NEED TO IMPLIMENT CPRM')
-    resolve({ admin: 'toast' })
+    console.log(oid + ' NEED TO IMPLIMENT GROUPS')
+    resolve({ admin: 1 })
   })
 }
 
@@ -29,8 +29,8 @@ app.use((req, res, next) => {
   // Verify user has JWT and assign context
   if ((req.locals || 0) && (req.locals.jwt || 0) && (req.locals.jwt.oid)) {
     // adding user CPRM
-    getCPRM(req.locals.jwt.oid).then(cprm => {
-      req.locals.cprm = cprm
+    getGroups(req.locals.jwt.oid).then(groups => {
+      req.locals.groups = groups
       next()
     }).catch(err => {
       res.setStatus = 500
