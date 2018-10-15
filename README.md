@@ -1,7 +1,8 @@
 # spike API
-The rem 5 api is designed to be a very light, fast and above all else simple api.
+The spike api is designed to be a very light, fast and above all else simple api.
 Easy for individuals of any skill level to use.
 
+```
 Outline
 ├── app/
 │   ├── asky.js - authorization\permission configuration
@@ -18,8 +19,12 @@ Outline
 ├── public/ - static file folder
 ├── uploads/ - upload folder
 └── logs/ - contain log files
+```
 
+# Building your APP
+## __app/__
+Your application lives in the __app/__ directory in this directory. Starting in the index.js. From here you create 
 
-Troubleshooting
+# Troubleshooting
 ### forbidden
 ensure that the requesting url is listed in the config hosts
