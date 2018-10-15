@@ -1,6 +1,5 @@
 const { response } = require('../../src')
 const spike = require('../../src/spike')
-const cp = require('../context')
 const asky = require('../asky')
 
 /**
