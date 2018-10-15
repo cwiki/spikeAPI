@@ -4,9 +4,13 @@ const developmentAuth = require('./development-auth')
 // determines which auth adapter to use based on environment
 module.exports = (environemnt) => {
   switch (environemnt) {
-    case 'producton':
-      return expressAdapter
+    case 'production':
+      console.log('Useing production auth');
+      return expressAdapter;
+      break;
     case 'development':
-      return developmentAuth
+      console.warn('Useing development auth');
+      return developmentAuth;
+      break;
   }
 }

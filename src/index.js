@@ -3,6 +3,30 @@ const logger = require('./logger') // winston logger
 const spike = require('./spike') // mysql interface
 const asky = require('./asky')
 
+/**
+ * express middleware that adds json formatting
+ * @param {*} _ requiest (not used)
+ * @param {*} res response
+ * @param {*} next next
+ */
+function sendJSON(_, res, next){
+  /**
+   * Logs and outputs a response to the express client
+   * @param {Object|string} err Error 
+   * @param {*} data Return payload
+   * @param {*} meta Other info
+ */
+res.sendJSON = function (err, data, meta) {
+  if (!err) err = undefined
+  if (err) {
+    this.status(500)
+    err = { level: err.level || 'info', message: err.message || err }
+    logger.log(err.level, err.message)
+  }
+  this.send({ err, data, meta })
+}
+next()
+}
 
 /**
  * Permission decorator for express methods
@@ -34,5 +58,6 @@ module.exports = {
   logger,
   spike,
   asky,
-  askyDecorator
+  askyDecorator,
+  sendJSON
 }

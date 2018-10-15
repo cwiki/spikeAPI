@@ -134,6 +134,7 @@ async function expressAdapter (req, res, next) {
   // remove bearer text
   token = token.substr('bearer '.length, token.length)
   try {
+    if (!req.locals) req.locals = {}
     req.locals.jwt = await authorizeToken(token)
   } catch (err) {
     res.statusCode = 401
