@@ -4,30 +4,20 @@ Easy for individuals of any skill level to use.
 
 Outline
 ├── app/
-│   ├── index.js
-│   ├── controllers/
-│   │   └── *.js - controllers (hook directly to models)
+│   ├── asky.js - authorization\permission configuration
+│   ├── index.js - entry point for API
+|   |
 │   ├── models/
-│   │   ├── connections.js - database connections
-│   │   └── *.js - database models (hook directly to storage)
-│   ├── models/
-│   │   ├── connections.js - database connections
-│   │   └── *.js - database models (hook directly to storage)
-│   ├── src/
-│   │   ├── index.js - groups together local plugins
-│   │   └── * - local plugins
+│   │   ├── connections.js - Database loader for models
+│   │   └── *.js - database definition files
+|   |
 │   └── views/
-│       ├── index.js - router instance urls
-│       └── *.js - views (hook directly to controllers)
-├── logs/
-│   ├── index.js - kept exclussively to keep logs folder in VC
-│   └── *.log
-
-├── config.js - local application config
-├── LICENSE.md
-├── package.json
-├── README.md
-└── server.js - application entry point
+│       ├── genericRoutes.js - generic REST endpoints with simple permission schema hooks
+│       └── *.js - API/Controller endpoints
+|
+├── public/ - static file folder
+├── uploads/ - upload folder
+└── logs/ - contain log files
 
 
 Troubleshooting
