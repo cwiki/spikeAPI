@@ -9,23 +9,23 @@ const asky = require('./asky')
  * @param {*} res response
  * @param {*} next next
  */
-function sendJSON(_, res, next){
+function sendJSON(_, res, next) {
   /**
    * Logs and outputs a response to the express client
    * @param {Object|string} err Error 
    * @param {*} data Return payload
    * @param {*} meta Other info
  */
-res.sendJSON = function (err, data, meta) {
-  if (!err) err = undefined
-  if (err) {
-    this.status(500)
-    err = { level: err.level || 'info', message: err.message || err }
-    logger.log(err.level, err.message)
+  res.sendJSON = function (err, data, meta) {
+    if (!err) err = undefined
+    if (err) {
+      this.status(500)
+      err = { level: err.level || 'info', message: err.message || err }
+      logger.log(err.level, err.message)
+    }
+    this.send({ err, data, meta })
   }
-  this.send({ err, data, meta })
-}
-next()
+  next()
 }
 
 /**
@@ -53,11 +53,54 @@ function askyDecorator(asky) {
   }
 }
 
+/**
+ * Validates that authorization has been completed
+ * @param {Object} req request
+ * @param {Object} res response
+ * @param {Object} next next
+ */
+function authenticationCheck(req, res, next) {
+  // Verify user has JWT and assign context
+  console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
+  if ((req.locals || 0) && (req.locals.jwt || 0) && (req.locals.jwt.oid)) {
+    next()
+  } else {
+    logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      + ' Authentication method not recognized')
+    res.setStatus = 401
+    res.end('Authentication method not recognized')
+  }
+}
+
+/**
+ * add authorization groups from storage
+ * @param {Object} req request
+ * @param {Object} res response
+ * @param {Object} next next
+ */
+function authorizationGroups(req, res, next) {
+  // adding user CPRM
+  return new Promise((resolve, reject) => {
+    console.log(req.locals.jwt.oid + ' NEED TO IMPLIMENT GROUPS')
+    resolve({ admin: 1 })
+  }).then(groups => {
+    req.locals.groups = groups
+    next()
+  }).catch(err => {
+    logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      + ' Unable to assign user level access')
+    res.setStatus = 500
+    res.end('Unable to assign user level access')
+  })
+}
+
 module.exports = {
   authentication,
   logger,
   spike,
   asky,
   askyDecorator,
-  sendJSON
+  sendJSON,
+  authenticationCheck,
+  authorizationGroups
 }

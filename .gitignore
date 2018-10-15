@@ -79,3 +79,7 @@ config.json
 
 # local configuration
 config.js
+
+# exclude everything in uploads except index
+uploads/*
+!uploads/index.js
