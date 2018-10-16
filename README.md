@@ -13,7 +13,7 @@ Outline
 │   │   └── *.js - database definition files
 |   |
 │   └── views/
-│       ├── genericRoutes.js - generic REST endpoints with simple permission schema hooks
+│       ├── genericRoutes.js - generic REST endpoints with simple permission schema 
 │       └── *.js - API/Controller endpoints
 |
 ├── public/ - static file folder
