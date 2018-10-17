@@ -14,51 +14,45 @@ const asky = require('../asky')
 function addGenerics(router, database, definition, action) {
     // IMPLIMENTS SPIKE.FIND
     router.get('/', asky.decorator('read', action, function (req, res) {
-        database.then(conn => {
-            spike.find(conn, definition, req.query)
-                .then(data => res.sendJSON(0, data[0]))
-                .catch(err => res.sendJSON(err.message))
-        })
-    }))
-    // IMPLIMENTS SPIKE.INSERT
-    router.post('/', asky.decorator('create', action, function (req, res) {
-        database.then(conn => {
-            spike.insert(conn, definition, req.body).then(data => {
-                spike.findOne(conn, definition, data[0].insertId).then(data => {
-                    res.sendJSON(0, data[0])
-                }).catch(err => { res.sendJSON(err.message) })
-            }).catch(err => { res.sendJSON(err.message) })
-        })
+        spike.find(database, definition, req.query)
+            .then(data => res.sendJSON(0, data[0]))
+            .catch(err => res.sendJSON(err.message))
     }))
     // IMPLIMENTS SPIKE.FINDONE
     router.get('/:id', asky.decorator('read', action, function (req, res) {
-        database.then(conn => {
-            spike.findOne(conn, definition, req.params.id)
-                .then(data => { res.sendJSON(0, data[0]) })
-                .catch(err => { res.sendJSON(err.message) })
-        })
+        spike.findOne(database, definition, req.params.id)
+            .then(data => { res.sendJSON(0, data[0]) })
+            .catch(err => { res.sendJSON(err.message) })
     }))
-    // IMPLIMENTS SPIKE.UPDATE
-    router.patch('/:id', asky.decorator('update', action, function (req, res) {
-        database.then(conn => {
-            spike.update(conn, definition, req.body, req.params.id).then(data => {
-                spike.findOne(conn, definition, req.params.id).then(data => {
-                    res.sendJSON(0, data[0])
-                }).catch(err => { res.sendJSON(err.message) })
-            }).catch(err => { res.sendJSON(err.message) })
-        })
-    }))
-    // IMPLIMENTS SPIKE.DESTROY
+    // IMPLIMENTS SPIKE.INSERT
+    // router.post('/', asky.decorator('create', action, function (req, res) {
+    //     database.then(conn => {
+    //         spike.insert(conn, definition, req.body).then(data => {
+    //             spike.findOne(conn, definition, data[0].insertId).then(data => {
+    //                 res.sendJSON(0, data[0])
+    //             }).catch(err => { res.sendJSON(err.message) })
+    //         }).catch(err => { res.sendJSON(err.message) })
+    //     })
+    // }))
+    // // IMPLIMENTS SPIKE.UPDATE
+    // router.patch('/:id', asky.decorator('update', action, function (req, res) {
+    //     database.then(conn => {
+    //         spike.update(conn, definition, req.body, req.params.id).then(data => {
+    //             spike.findOne(conn, definition, req.params.id).then(data => {
+    //                 res.sendJSON(0, data[0])
+    //             }).catch(err => { res.sendJSON(err.message) })
+    //         }).catch(err => { res.sendJSON(err.message) })
+    //     })
+    // }))
+    // // IMPLIMENTS SPIKE.DESTROY
     router.delete('/:id', asky.decorator('delete', action, function (req, res) {
-        database.then(conn => {
-            spike.destroy(conn, definition, req.params.id).then(data => {
-                if (data[0].affectedRows) {
-                    res.sendJSON(null, 'success')
-                } else {
-                    res.sendJSON('unable to delete object')
-                }
-            }).catch(err => { res.sendJSON(err.message) })
-        })
+        spike.destroy(database, definition, req.params.id).then(data => {
+            if (data[0].affectedRows) {
+                res.sendJSON(null, 'success')
+            } else {
+                res.sendJSON('unable to delete object')
+            }
+        }).catch(err => { res.sendJSON(err.message) })
     }))
 }
 
