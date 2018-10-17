@@ -21,6 +21,9 @@ Outline
 └── logs/ - contain log files
 ```
 
+# setting environments
+* windows `set NODE_ENV=production`
+
 # Building your APP
 ## __app/__
 Your application lives in the __app/__ directory in this directory. Starting in the index.js. From here you create 

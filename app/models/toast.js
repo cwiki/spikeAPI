@@ -1,8 +1,8 @@
 // toast model definition
 const definition = {
-    tableName: 'toast_soft',
+    tableName: 'toast',
     primaryField: 'id',
-    softDeleteField: "deleted_at",
+    // softDeleteField: "deleted_at",
     searchFields: ['id', 'name'],
 }
 
