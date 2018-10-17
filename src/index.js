@@ -62,7 +62,6 @@ function askyDecorator(asky) {
  */
 function authenticationCheck(req, res, next) {
   // Verify user has JWT and assign context
-  console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
   if ((req.locals || 0) && (req.locals.jwt || 0) && (req.locals.jwt.oid)) {
     next()
   } else {
@@ -81,9 +80,12 @@ function authenticationCheck(req, res, next) {
  */
 function authorizationGroups(req, res, next) {
   // adding user CPRM
-  allcores.query("SELECT `groups` FROM `users` WHERE oid = ?", [req.locals.jwt.oid])
+  allcores.query('SELECT `groups` FROM `users` WHERE `oid` = ? AND `enabled` = 1 LIMIT 1',
+    [String(req.locals.jwt.oid)])
     .then(groups => {
-      req.locals.groups = groups[0][0].groups
+      const [data] = groups
+      const first = data.shift()
+      req.locals.groups = first.groups || {}
       next()
     }).catch(err => {
       logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
