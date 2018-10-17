@@ -85,7 +85,7 @@ function authorizationGroups(req, res, next) {
     .then(groups => {
       const [data] = groups
       const first = data.shift()
-      req.locals.groups = first.groups || {}
+      req.locals.groups = (first.groups) ? JSON.parse(first.groups) : {}
       next()
     }).catch(err => {
       logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress

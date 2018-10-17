@@ -7,8 +7,7 @@ COPY package*.json ./
 # If you are building your code for production
 # RUN npm install --only=production
 RUN npm install
-RUN npm i -g supervisor
 # Bundle app source
 COPY . . 
 EXPOSE 3000
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start" ]
