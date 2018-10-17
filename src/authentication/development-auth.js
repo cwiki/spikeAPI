@@ -11,7 +11,7 @@ module.exports = (req, _, next) => {
     given_name,
     'ipaddr': faker.internet.ip(),
     'name': given_name + ' ' + family_name,
-    'oid': faker.random.uuid(),
+    'oid': '00000000-0000-0000-0000-000000000000',
     'unique_name': upn,
     upn
   }

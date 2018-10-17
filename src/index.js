@@ -2,6 +2,7 @@ const authentication = require('./authentication') // azure ACTIVE DIRECTORY AUT
 const logger = require('./logger') // winston logger
 const spike = require('./spike') // mysql interface
 const asky = require('./asky')
+const { allcores } = require('../app/models/connections')
 
 /**
  * express middleware that adds json formatting
@@ -80,18 +81,16 @@ function authenticationCheck(req, res, next) {
  */
 function authorizationGroups(req, res, next) {
   // adding user CPRM
-  return new Promise((resolve, reject) => {
-    console.log(req.locals.jwt.oid + ' NEED TO IMPLIMENT GROUPS')
-    resolve({ admin: 1 })
-  }).then(groups => {
-    req.locals.groups = groups
-    next()
-  }).catch(err => {
-    logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
-      + ' Unable to assign user level access')
-    res.setStatus = 500
-    res.end('Unable to assign user level access')
-  })
+  allcores.query("SELECT `groups` FROM `users` WHERE oid = ?", [req.locals.jwt.oid])
+    .then(groups => {
+      req.locals.groups = groups[0][0].groups
+      next()
+    }).catch(err => {
+      logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        + ' Unable to assign user level access')
+      res.setStatus = 500
+      res.end('Unable to assign user level access')
+    })
 }
 
 module.exports = {

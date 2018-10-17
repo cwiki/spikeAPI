@@ -6,7 +6,8 @@ const { asky, askyDecorator } = require('../src')
 const ask = asky()
 
 // configuration
-ask.allow('admin').to('toast').to('orders')
+ask.allow('admin').to('toast').to('users')
+ask.allow('cores').to('orders')
 
 // provides a loaded askyDecorator 
 module.exports = {
