@@ -112,6 +112,7 @@ async function authorizeToken (token) {
     keys = await requestKeys(null, true)
     x5c = findX5C(keys.keys, token)
   }
+  if (Array.isArray(x5c)) x5c = x5c.pop()
   return validate(token, x5c, verifyOptions)
 }
 
@@ -139,6 +140,7 @@ async function expressAdapter (req, res, next) {
   } catch (err) {
     res.statusCode = 401
     res.set('Content-Type', 'text/json')
+    console.error(err)
     res.json({ error: err.message })
     return
   }
