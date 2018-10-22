@@ -15,20 +15,12 @@ const keyCache = new Map()
 let verifyOptions = {}
 
 /**
- * Sets the verify options
- * @param {*} verifyOptions
- */
-function setVerifyOptions (verifyOptions) {
-  verifyOptions = verifyOptions
-}
-
-/**
  * Verifies Token JS
  * @param token // Bearer token (should not include bearer text)
  * @param x5cString // MSFT decoder key
  * @param {audience, issuer} verifyOptions
  */
-function validate (token, x5cString, verifyOptions) {
+function validate(token, x5cString, verifyOptions) {
   const publicKey = '-----BEGIN CERTIFICATE-----\n' + x5cString + '\n-----END CERTIFICATE-----'
   let verifiedToken
   verifiedToken = jwt.verify(token, publicKey, verifyOptions)
@@ -45,7 +37,7 @@ function validate (token, x5cString, verifyOptions) {
  * @param {*} force
  * @return {keys: {}}
  */
-function requestKeys (url, force = false) {
+function requestKeys(url, force = false) {
   url = url || 'https://login.microsoftonline.com/common/discovery/keys'
   return new Promise((resolve, reject) => {
     if (keyCache.has(url) && !force) {
@@ -77,7 +69,7 @@ function requestKeys (url, force = false) {
  * @param {*} keys
  * @param token
  */
-function findX5C (keys, token) {
+function findX5C(keys, token) {
   const jwtHeader = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString('ascii'))
   if (!jwtHeader.hasOwnProperty('x5t')) throw Error('x5t not present on JWT')
   let found = keys.find(key => key.x5t === jwtHeader.x5t)
@@ -90,7 +82,7 @@ function findX5C (keys, token) {
  * @param issuer
  * @return boolean
  */
-function checkIssuer (token, issuer) {
+function checkIssuer(token, issuer) {
   const splitToken = token.split('.')
   if (typeof splitToken[1] === undefined) return false
   const jwtHeader = JSON.parse(Buffer.from(splitToken[1], 'base64').toString('ascii'))
@@ -100,20 +92,23 @@ function checkIssuer (token, issuer) {
 
 /**
  * handles azure authentication
- * @param {*} token
+ * @param {!string} token
  * @throws error
- * @returns jwt
+ * @returns {Object} jwt
  */
-async function authorizeToken (token) {
-  let keys, x5c
-  keys = await requestKeys()
-  x5c = findX5C(keys.keys, token)
-  if (!x5c) {
-    keys = await requestKeys(null, true)
-    x5c = findX5C(keys.keys, token)
+async function authorizeToken(token) {
+  try {
+    // attempts to find x5t twice
+    let keys = await requestKeys()
+    let x5c = findX5C(keys.keys, token)
+    if (!x5c) {
+      keys = await requestKeys(null, true)
+      x5c = findX5C(keys.keys, token)
+    }
+    return validate(token, x5c, verifyOptions)
+  } catch (err) {
+    throw err
   }
-  if (Array.isArray(x5c)) x5c = x5c.pop()
-  return validate(token, x5c, verifyOptions)
 }
 
 /**
@@ -125,31 +120,35 @@ async function authorizeToken (token) {
  * @param {*} res
  * @callback next
  */
-async function expressAdapter (req, res, next) {
-  // skip if no auth header
+async function expressAdapter(req, res, next) {
   if (!req.headers.authorization) {
-    return next()
+    next()
+  } else {
+    // get token remove bearer text
+    const bearer = req.headers.authorization
+    const token = bearer.substr('bearer '.length, bearer.length)
+    try {
+      const jwt = await authorizeToken(token)
+      if (!req.locals) req.locals = {}
+      req.locals.jwt = jwt
+      next()
+    } catch (err) {
+      // throw error if validation failure
+      console.error(err)
+      res.statusCode = 401
+      res.set('Content-Type', 'text/json')
+      res.json({ error: err.message })
+    }
   }
-  // get token
-  let token = req.headers.authorization
-  // remove bearer text
-  token = token.substr('bearer '.length, token.length)
-  try {
-    if (!req.locals) req.locals = {}
-    req.locals.jwt = await authorizeToken(token)
-  } catch (err) {
-    res.statusCode = 401
-    res.set('Content-Type', 'text/json')
-    console.error(err)
-    res.json({ error: err.message })
-    return
-  }
-  return next()
 }
 
 /**
  * Azure Auth
  * Authoriztion headers are pulled from the req variable
+ * @param {!Object} options configuration options
+ * @return {function} express api
  */
-
-module.exports = { expressAdapter, setVerifyOptions, authorizeToken }
+module.exports = (options) => {
+  verifyOptions = options
+  return expressAdapter
+}
