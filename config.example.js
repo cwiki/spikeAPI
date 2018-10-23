@@ -3,14 +3,6 @@ const hosts = [
   'localhost:3000'
 ]
 
-const databases = {
-  production: {
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'database_name'
-  }
-}
 const environment = (process.env.NODE_ENV || 'production').toLowerCase()
 
 const databases = {
