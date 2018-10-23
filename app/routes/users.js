@@ -4,10 +4,10 @@ const router = express.Router()
 const { allcores } = require('../models/connections')
 // users db definition
 const users = require('../models/users').definition
-// const generics = require('./genericRoutes').addGenerics
+const spike = require('../../src/spike')
 
 // Wrap users in generic api resolvers
-router.get('/me', (req, res) => {
+router.get('/self', (req, res) => {
     try {
         let oid = String(req.locals.jwt.oid)
         allcores.query('SELECT * FROM ?? WHERE `oid` = ? AND `enabled` = 1 LIMIT 1',
