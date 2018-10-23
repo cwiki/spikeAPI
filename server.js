@@ -1,13 +1,15 @@
 const express = require('express')
+
 const bodyParser = require('body-parser')
-const app = express()
-const port = 3000
-const RateLimit = require('express-rate-limit')
-const { rateLimit, hosts, environment } = require('./config')
 const cors = require('cors')
+const RateLimit = require('express-rate-limit')
 const hostValidation = require('host-validation')
 
+const { rateLimit, hosts, environment } = require('./config')
 const { authentication, logger, sendJSON, authorizationGroups, authenticationCheck } = require('./src')
+
+const app = express()
+const port = 3000
 
 // adds sendJSON formatting helper
 app.use(express.static(__dirname + '/public'))

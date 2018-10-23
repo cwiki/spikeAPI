@@ -11,7 +11,18 @@ const databases = {
     database: 'database_name'
   }
 }
-const environment = (process.env.NODE_ENV || 'development').toLowerCase()
+const environment = (process.env.NODE_ENV || 'production').toLowerCase()
+
+const databases = {
+  allcores: {
+    'connectionLimit' : 20,
+    'host': 'localhost',
+    'user': 'root',
+    'password': 'root',
+    'database': 'test_db',
+  }
+}
+
 const providers = {
   azure_auth: {
     audience: '<audience from azure>',
@@ -24,18 +35,14 @@ const rateLimit = {
   max: 5000, // limit each IP to 100 requests per windowMs
   delayMs: 0, // disable delaying - full speed until the max limit is reached
   handler: ({ res }) => {
-    res.send(formatError({ message: 'Rate limit reached, please try again later' }))
+    res.send({ 'err': 'Rate limit reached, please try again later' })
   }
+}
 
 module.exports = {
   databases,
   environment,
-  path,
-  port,
-  playground,
+  hosts,
   providers,
-  rateLimit,
-  actionProfile,
-  actionPermissions,
-  development
+  rateLimit
 }

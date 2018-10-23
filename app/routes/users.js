@@ -4,7 +4,7 @@ const router = express.Router()
 const { allcores } = require('../models/connections')
 // users db definition
 const users = require('../models/users').definition
-const generics = require('./genericRoutes').addGenerics
+// const generics = require('./genericRoutes').addGenerics
 
 // Wrap users in generic api resolvers
 router.get('/me', (req, res) => {

@@ -85,9 +85,13 @@ function authorizationGroups(req, res, next) {
     .then(groups => {
       const [data] = groups
       const first = data.shift()
-      req.locals.groups = (first.groups) ? JSON.parse(first.groups) : {}
+      const groupsObject = (typeof first.groups === 'string')
+        ? JSON.parse(first.groups)
+        : first.groups
+      req.locals.groups = groupsObject || {}
       next()
     }).catch(err => {
+      console.log(err)
       logger.warn(req.headers['x-forwarded-for'] || req.connection.remoteAddress
         + ' Unable to assign user level access')
       res.setStatus = 500
